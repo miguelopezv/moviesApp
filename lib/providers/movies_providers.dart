@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:movies/models/actor_model.dart';
 import 'package:movies/models/movie_model.dart';
 
 class MoviesProvider {
@@ -24,6 +25,7 @@ class MoviesProvider {
     _popularMoviesStreamController?.close();
   }
 
+// TODO: Refactor so that it can be used by all methods
   Future<List<Movie>> _getData(Uri url) async {
     final resp = await http.get(url);
     final decodedData = json.decode(resp.body);
@@ -63,5 +65,18 @@ class MoviesProvider {
 
     // TODO: Remove this and update method
     return res;
+  }
+
+  Future<List<Actor>> getCast(String movieId) async {
+    // TODO: move this to a _private variable
+    final url = Uri.https(_url, '3/movie/$movieId/credits', {
+      'api_key': _apiKey,
+      'language': _lang,
+    });
+
+    final resp = await http.get(url);
+    final decodedData = json.decode(resp.body);
+    final cast = new Cast.fromJsonList(decodedData['cast']);
+    return cast.actors;
   }
 }
