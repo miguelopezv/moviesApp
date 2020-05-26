@@ -33,7 +33,7 @@ class MovieCarousel extends StatelessWidget {
   }
 
   Widget _card(Size _screeSize, BuildContext context, Movie movie) {
-    return Container(
+    final _movieCard = Container(
       margin: EdgeInsets.only(right: 15),
       child: Column(
         children: <Widget>[
@@ -56,6 +56,13 @@ class MovieCarousel extends StatelessWidget {
           )
         ],
       ),
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, 'details', arguments: movie);
+      },
+      child: _movieCard,
     );
   }
 }
