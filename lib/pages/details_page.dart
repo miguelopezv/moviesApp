@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:movies/models/actor_model.dart';
 import 'package:movies/models/movie_model.dart';
+import 'package:movies/providers/movies_providers.dart';
 
 class DetailsPage extends StatelessWidget {
   @override
@@ -16,7 +18,8 @@ class DetailsPage extends StatelessWidget {
                 height: 10,
               ),
               _posterTitle(context, movie),
-              _movieDescription(movie)
+              _movieDescription(movie),
+              _movieCast(movie.id)
             ]),
           )
         ],
@@ -92,6 +95,62 @@ class DetailsPage extends StatelessWidget {
       child: Text(
         movie.overview,
         textAlign: TextAlign.justify,
+      ),
+    );
+  }
+
+  Widget _movieCast(int id) {
+    final _movieProvider = new MoviesProvider();
+    return FutureBuilder(
+      future: _movieProvider.getCast(id),
+      builder: (BuildContext context, AsyncSnapshot<List<Actor>> snapshot) {
+        if (snapshot.hasData) {
+          return _createCarousel(snapshot.data);
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _createCarousel(List<Actor> data) {
+    return SizedBox(
+      height: 220,
+      child: PageView.builder(
+        pageSnapping: false,
+        itemCount: data.length,
+        controller: PageController(
+          viewportFraction: 0.3,
+          initialPage: 1,
+        ),
+        itemBuilder: (context, i) => _actorCard(data[i]),
+      ),
+    );
+  }
+
+  Widget _actorCard(Actor actor) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: FadeInImage(
+                image: NetworkImage(actor.getPhoto()),
+                placeholder: AssetImage('assets/img/no-image.jpg'),
+                height: 180,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Text(
+            actor.name,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
